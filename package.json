@@ -1,0 +1,11 @@
+{
+  "name": "wf-invite-bot",
+  "version": "0.0.1",
+  "description": "A Reddit bot to collect invite codes and select one to add to a subreddit description",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jayrobin",
+  "license": "MIT"
+}
