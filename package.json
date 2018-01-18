@@ -4,7 +4,8 @@
   "description": "A Reddit bot to collect invite codes and select one to add to a subreddit description",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/babel-node index.js"
+    "start": "npm install && npm run bot",
+    "bot": "./node_modules/.bin/babel-node index.js"
   },
   "author": "jayrobin",
   "license": "MIT",
