@@ -2,7 +2,6 @@ import snoowrap from 'snoowrap';
 import dotenv from "dotenv";
 dotenv.config();
 
-const REFERRAL_POST_ID = '7r5uk6';
 const REFERRAL_URL_REGEX = /https:\/\/wlth\.fr\/\w{7}/;
 
 const config = {
@@ -14,7 +13,7 @@ const config = {
 };
 
 async function getComments() {
-	const submission = await reddit.getSubmission(REFERRAL_POST_ID);
+	const submission = await reddit.getSubmission(process.env.REFERRAL_POST_ID);
 	const replies = await submission.expandReplies();
 	return replies.comments.map(reply => reply.body);
 }
