@@ -45,6 +45,7 @@ async function setRandomReferralCode() {
 
 		const subreddit = await reddit.getSubreddit('wealthfront')
 		await subreddit.editSettings({
+			description: `Use this invite code when signing up to get an extra $5k managed for free: ${referralCode}`,
 			public_description: `Use this invite code when signing up to get an extra $5k managed for free: ${referralCode}`
 		});
 
