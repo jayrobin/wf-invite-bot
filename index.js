@@ -2,7 +2,7 @@ import snoowrap from 'snoowrap';
 import dotenv from "dotenv";
 dotenv.config();
 
-const REFERRAL_URL_REGEX = /https:\/\/wlth\.fr\/\w{7}/;
+const REFERRAL_URL_REGEX = /(https:\/\/www.wealthfront.com\/c\/affiliates\/invited\/[\d\w]{4}-[\d\w]{4}-[\d\w]{4}-[\d\w]{4}|https:\/\/wlth\.fr\/\w{7})/;
 
 const config = {
 	client_id: process.env.CLIENT_ID,
