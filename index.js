@@ -4,6 +4,11 @@ dotenv.config();
 
 const REFERRAL_URL_REGEX = /(https:\/\/www.wealthfront.com\/(c\/affiliates\/)?invited\/[\d\w]{4}-[\d\w]{4}-[\d\w]{4}-[\d\w]{4}|https:\/\/wlth\.fr\/\w{7})/;
 
+const postsToUpdate = [
+	process.env.INVESTMENT_REFERRAL_POST_ID,
+	process.env.CASH_REFERRAL_POST_ID,
+];
+
 const config = {
 	client_id: process.env.CLIENT_ID,
 	client_secret: process.env.CLIENT_SECRET,
@@ -12,8 +17,7 @@ const config = {
 	user_agent: 'wf-invite-bot'
 };
 
-async function getComments() {
-	const submission = await reddit.getSubmission(process.env.REFERRAL_POST_ID);
+async function getComments(submission) {
 	const replies = await submission.expandReplies();
 	return replies.comments.map(reply => reply.body);
 }
@@ -32,22 +36,19 @@ function extractReferralCodes(comments) {
 	return [...uniqueCodes];
 }
 
-async function getReferralCodes() {
-	const replies = await getComments();
+async function getReferralCodes(submission) {
+	const replies = await getComments(submission);
 	return extractReferralCodes(replies);
 }
 
-async function setRandomReferralCode() {
-	const referralCodes = await getReferralCodes();
+async function updatePostReferralCode(postId) {
+	const submission = await reddit.getSubmission(postId);
+	const referralCodes = await getReferralCodes(submission);
 
 	if (referralCodes.length) {
 		const referralCode = referralCodes[Math.floor(Math.random() * referralCodes.length)];
 
-		const subreddit = await reddit.getSubreddit('wealthfront')
-		await subreddit.editSettings({
-			description: `Use this invite code when signing up to get an extra $5k managed for free: ${referralCode}`,
-			public_description: `Use this invite code when signing up to get an extra $5k managed for free: ${referralCode}`
-		});
+		await submission.edit(`Learn more and redeem at: ${referralCode}\n\n(Post your own referral codes below)`)
 
 		console.log(`Invite code updated to ${referralCode}`);
 	} else {
@@ -56,4 +57,4 @@ async function setRandomReferralCode() {
 }
 
 const reddit = new snoowrap(config);
-setRandomReferralCode();
+postsToUpdate.map(updatePostReferralCode)
