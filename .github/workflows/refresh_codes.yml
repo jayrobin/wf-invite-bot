@@ -1,0 +1,23 @@
+name: Refresh invite codes
+
+on:
+  schedule:
+  - cron: "0 0 * * *"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+    - name: Refresh codes
+      run: npm run start
+      env:
+        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        REDDIT_PASS: ${{ secrets.REDDIT_PASS }}
+        REDDIT_USER: ${{ secrets.REDDIT_USER }}
+        INVESTMENT_REFERRAL_POST_ID: ${{ secrets.INVESTMENT_REFERRAL_POST_ID }}
+        CASH_REFERRAL_POST_ID: ${{ secrets.CASH_REFERRAL_POST_ID }}
