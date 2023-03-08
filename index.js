@@ -14,7 +14,7 @@ const config = {
 	client_secret: process.env.CLIENT_SECRET,
 	username: process.env.REDDIT_USER,
 	password: process.env.REDDIT_PASS,
-	user_agent: 'wf-invite-bot'
+	user_agent: 'wf-invite-bot',
 };
 
 async function getComments(submission) {
@@ -57,4 +57,8 @@ async function updatePostReferralCode(postId) {
 }
 
 const reddit = new snoowrap(config);
+reddit.config({
+	requestDelay: 5000,
+	continueAfterRatelimitError: true,
+});
 postsToUpdate.map(updatePostReferralCode)
