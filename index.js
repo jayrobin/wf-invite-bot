@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const REFERRAL_URL_REGEX = /(https:\/\/www.wealthfront.com\/(c\/affiliates\/)?invited\/[\d\w]{4}-[\d\w]{4}-[\d\w]{4}-[\d\w]{4}|https:\/\/wlth\.fr\/\w{7})/;
+const DUPE_COMMENT_ALLOWLIST = ['AutoModerator', 'wf-invite-bot', '[deleted]'];
 
 const postsToUpdate = [
 	process.env.INVESTMENT_REFERRAL_POST_ID,
@@ -19,12 +20,12 @@ const config = {
 
 async function getComments(submission) {
 	const replies = await submission.expandReplies();
-	return replies.comments.map(reply => reply.body);
+	return replies.comments;
 }
 
 function extractReferralCodes(comments) {
-	const uniqueCodes = comments.reduce((codes, comment) => {
-		let matches = comment.match(REFERRAL_URL_REGEX);
+	const uniqueCodes = comments.reduce((codes, { body }) => {
+		let matches = body.match(REFERRAL_URL_REGEX);
 
 		if (matches) {
 			codes.add(matches[0]);
@@ -36,14 +37,26 @@ function extractReferralCodes(comments) {
 	return [...uniqueCodes];
 }
 
-async function getReferralCodes(submission) {
-	const replies = await getComments(submission);
-	return extractReferralCodes(replies);
+function removeDupeUserComments(comments) {
+	const promises = [];
+	const usersWithComments = new Set();
+
+	comments.forEach(async comment => {
+		if (!usersWithComments.has(comment.author.name)) {
+			usersWithComments.add(comment.author.name);
+		} else if (!comment.removed && !DUPE_COMMENT_ALLOWLIST.includes(comment.author.name)) {
+			console.log(`Removing comment from ${comment.author.name}`);
+			promises.push(comment.delete());
+		}
+	});
+
+	return Promise.all(promises);
 }
 
 async function updatePostReferralCode(postId) {
 	const submission = await reddit.getSubmission(postId);
-	const referralCodes = await getReferralCodes(submission);
+	const comments = await getComments(submission);
+	const referralCodes = extractReferralCodes(comments);
 
 	if (referralCodes.length) {
 		const referralCode = referralCodes[Math.floor(Math.random() * referralCodes.length)];
@@ -54,6 +67,8 @@ async function updatePostReferralCode(postId) {
 	} else {
 		console.log('No invite codes found');
 	}
+
+	await removeDupeUserComments(comments);
 }
 
 const reddit = new snoowrap(config);
