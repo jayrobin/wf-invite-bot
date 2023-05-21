@@ -63,7 +63,7 @@ async function updatePostReferralCode(postId) {
 	if (referralCodes.length) {
 		const referralCode = referralCodes[Math.floor(Math.random() * referralCodes.length)];
 
-		await submission.edit(`Learn more and redeem at: ${referralCode}\n\n(Post your own referral codes below)`)
+		await submission.edit(`Learn more and redeem at: ${referralCode}\n\n(Post your own referral codes below)\n\n# Important: only one post per user/referral code. Duplicates will be deleted. Repeated posting will result in a ban`)
 
 		console.log(`Invite code updated to ${referralCode}`);
 	} else {
