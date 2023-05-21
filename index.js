@@ -42,11 +42,13 @@ function removeDupeUserComments(comments) {
 	const usersWithComments = new Set();
 
 	comments.forEach(async comment => {
-		if (!usersWithComments.has(comment.author.name)) {
-			usersWithComments.add(comment.author.name);
-		} else if (!comment.removed && !DUPE_COMMENT_ALLOWLIST.includes(comment.author.name)) {
-			console.log(`Removing comment from ${comment.author.name}`);
-			promises.push(comment.delete());
+		if (!comment.removed && !DUPE_COMMENT_ALLOWLIST.includes(comment.author.name)) {
+			if (!usersWithComments.has(comment.author.name)) {
+				usersWithComments.add(comment.author.name);
+			} else {
+				console.log(`Removing comment from ${comment.author.name}`);
+				promises.push(comment.delete());
+			}
 		}
 	});
 
